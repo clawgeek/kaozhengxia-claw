@@ -1,0 +1,121 @@
+name: kaozhengxia-claw
+
+# 本地/单机高可用参考编排：
+# Nginx（静态 + 负载均衡）→ 3 个无状态 API 副本 → PostgreSQL + Redis
+# 真正多机房高可用请用 k8s/ 下的清单 + 托管数据库。
+
+x-api-env: &api-env
+  NODE_ENV: production
+  PORT: "8080"
+  WEB_ROOT: /app/web
+  DATABASE_URL: postgres://claw:${POSTGRES_PASSWORD:-claw_pass}@postgres:5432/claw
+  REDIS_URL: redis://redis:6379
+  JWT_SECRET: ${JWT_SECRET:-change-me-in-production-please}
+  ADMIN_PHONE: ${ADMIN_PHONE:-13354281998}
+  ADMIN_PASSWORD: ${ADMIN_PASSWORD:-sangjiexun@2026}
+  ADMIN_NAME: ${ADMIN_NAME:-桑杰逊}
+  TRUST_PROXY: "true"
+  CORS_ORIGINS: "*"
+  PG_POOL_MAX: "20"
+
+x-api-common: &api-common
+  build:
+    context: .
+  image: kaozhengxia-claw:latest
+  environment: *api-env
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+    interval: 15s
+    timeout: 3s
+    retries: 3
+    start_period: 25s
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: claw
+      POSTGRES_USER: claw
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-claw_pass}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claw -d claw"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    restart: unless-stopped
+
+  # 一次性种子任务：建表 + 259 门课 + 3709 节课时 + 管理员
+  seed:
+    build:
+      context: .
+    image: kaozhengxia-claw:latest
+    command: ["node", "src/seed.js"]
+    environment: *api-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"
+
+  api1: &api
+    <<: *api-common
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+
+  api2:
+    <<: *api-common
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+
+  api3:
+    <<: *api-common
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./web:/usr/share/nginx/html:ro
+    depends_on:
+      - api1
+      - api2
+      - api3
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:

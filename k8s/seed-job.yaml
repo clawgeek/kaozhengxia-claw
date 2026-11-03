@@ -1,0 +1,36 @@
+# 一次性初始化任务：建表 + 导入 259 门课程 / 3709 节课时 + 管理员账号
+# 幂等，可重复执行；上线前跑一次即可
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: claw-seed
+  labels:
+    app: claw-seed
+spec:
+  backoffLimit: 5
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: claw-seed
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 100
+      containers:
+        - name: seed
+          image: ghcr.io/chinaopenclaw/kaozhengxia-claw:1.0.0
+          command: ["node", "src/seed.js"]
+          envFrom:
+            - configMapRef:
+                name: claw-config
+            - secretRef:
+                name: claw-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi

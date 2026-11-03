@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+server/data
+*.db
+*.db-shm
+*.db-wal
+.git
+.github
+.env
+*.log
+dist
+docs
+k8s

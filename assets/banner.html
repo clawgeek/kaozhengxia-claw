@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1600px; height: 520px; overflow: hidden; background: #FAF5EB; }
+  .banner {
+    position: relative; width: 1600px; height: 520px; overflow: hidden;
+    background: #FAF5EB; box-shadow: inset 0 0 0 1px #E5DDC8;
+    font-family: "Microsoft YaHei", "PingFang SC", "Source Han Sans SC", sans-serif;
+  }
+  /* 图片容器裁掉底部 40px，正好去掉右下角水印 */
+  .art { position: absolute; right: 0; top: 0; height: 520px; overflow: hidden; }
+  .art img { height: 560px; width: auto; display: block; }
+  /* 左侧奶油色渐隐，抹平底图与页面底色接缝 */
+  .fade {
+    position: absolute; left: 0; top: 0; width: 1200px; height: 520px; z-index: 3;
+    background: linear-gradient(to right, #FAF5EB 0%, #FAF5EB 56%, rgba(250,245,235,0) 100%);
+  }
+  .copy { position: absolute; left: 92px; top: 96px; z-index: 5; width: 760px; }
+  .eyebrow {
+    font-family: Consolas, "SF Mono", monospace;
+    font-size: 13px; letter-spacing: 4.2px; color: #C53A2A; font-weight: 700;
+    margin-bottom: 26px;
+  }
+  h1 {
+    font-size: 76px; line-height: 1.06; letter-spacing: 1px;
+    font-weight: 800; color: #1A1A1A;
+  }
+  h1 em { font-style: normal; color: #C53A2A; }
+  .line { width: 58px; height: 3px; background: #C53A2A; margin: 26px 0 22px; }
+  .sub { font-size: 21px; line-height: 1.72; color: #4A443A; letter-spacing: .3px; }
+  .meta {
+    margin-top: 30px; font-family: Consolas, "SF Mono", monospace;
+    font-size: 12.5px; letter-spacing: .6px; color: #7A7264;
+  }
+  .tag {
+    position: absolute; left: 92px; bottom: 62px; z-index: 5;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: Consolas, monospace; font-size: 11px; letter-spacing: 1.6px;
+    color: #5C5448; border: 1px solid #CFC4A8; padding: 7px 13px;
+  }
+  .tag i { width: 6px; height: 6px; background: #C53A2A; display: block; border-radius: 50%; }
+</style>
+</head>
+<body>
+  <div class="banner">
+    <div class="art"><img src="banner-art.png" alt=""></div>
+    <div class="fade"></div>
+
+    <div class="copy">
+      <div class="eyebrow">KAOZHENGXIA CLAW · 2026</div>
+      <h1>考证虾 <em>Claw</em></h1>
+      <div class="line"></div>
+      <div class="sub">142 门认证课 × 117 门职场课<br>前后台一体 · 高可用架构 · 付费即可真实学习</div>
+      <div class="meta">作者 桑杰逊 · Node.js / Fastify / PostgreSQL / Redis / Nginx</div>
+    </div>
+
+    <div class="tag"><i></i>IT 云课学习平台 · 全栈开源</div>
+  </div>
+</body>
+</html>
