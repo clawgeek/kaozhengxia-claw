@@ -10,14 +10,9 @@
     background: #FAF5EB; box-shadow: inset 0 0 0 1px #E5DDC8;
     font-family: "Microsoft YaHei", "PingFang SC", "Source Han Sans SC", sans-serif;
   }
-  /* 图片容器裁掉底部 40px，正好去掉右下角水印 */
-  .art { position: absolute; right: 0; top: 0; height: 520px; overflow: hidden; }
-  .art img { height: 560px; width: auto; display: block; }
-  /* 左侧奶油色渐隐，抹平底图与页面底色接缝 */
-  .fade {
-    position: absolute; left: 0; top: 0; width: 1200px; height: 520px; z-index: 3;
-    background: linear-gradient(to right, #FAF5EB 0%, #FAF5EB 56%, rgba(250,245,235,0) 100%);
-  }
+  /* OpenClaw 龙虾吉祥物：底图已是同色奶油，直接贴底站立 */
+  .art { position: absolute; right: 20px; bottom: -8px; height: 525px; }
+  .art img { height: 525px; width: auto; display: block; }
   .copy { position: absolute; left: 92px; top: 96px; z-index: 5; width: 760px; }
   .eyebrow {
     font-family: Consolas, "SF Mono", monospace;
@@ -46,8 +41,7 @@
 </head>
 <body>
   <div class="banner">
-    <div class="art"><img src="banner-art.png" alt=""></div>
-    <div class="fade"></div>
+    <div class="art"><img src="mascot.png" alt="OpenClaw 龙虾吉祥物"></div>
 
     <div class="copy">
       <div class="eyebrow">KAOZHENGXIA CLAW · 2026</div>
